@@ -1,0 +1,22 @@
+{
+  "name": "Noor Verse",
+  "short_name": "Noor Verse",
+  "description": "An Islamic companion application featuring the Holy Quran, Qibla compass, and Prayer times.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#F4F7F6",
+  "theme_color": "#0B3D2E",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
