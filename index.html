@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0B3D2E">
+    <title>Noor Verse - Islamic Companion</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="logo.png">
+    
+    <style>
+        :root {
+            --primary: #0B3D2E;
+            --primary-light: #165c47;
+            --accent: #C19A6B;
+            --bg: #F4F7F6;
+            --mushaf-bg: #FDFBF7;
+            --text-dark: #1A1A1A;
+            --text-light: #FFFFFF;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --shadow-3d: 0 8px 32px 0 rgba(11, 61, 46, 0.15);
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            overscroll-behavior-y: none;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-3d);
+        }
+
+        /* SPA Layout & Transitions */
+        #app-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            padding-top: var(--safe-top);
+            padding-bottom: var(--safe-bottom);
+            background: var(--bg);
+            animation: fadeIn 0.3s ease-out forwards;
+            overflow-y: auto;
+        }
+
+        .view.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Reusable Components */
+        .header {
+            background: var(--primary);
+            color: var(--text-light);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .header h1 { font-size: 1.2rem; font-weight: 600; }
+        
+        .btn-icon {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-icon svg { width: 24px; height: 24px; fill: currentColor; }
+        /* ہیڈر لوگو کا اسٹائل */
+.header-logo {
+    width: 42px;       /* لوگو کا سائز */
+    height: 42px;
+    border-radius: 50%; /* اسے مکمل گول بناتا ہے */
+    object-fit: cover;  /* اگر تصویر چوکور نہ ہو تو اسے کھنچنے سے بچاتا ہے */
+    border: 2px solid var(--accent); /* ایک خوبصورت سنہری بارڈر جو پریمیم لک دیتا ہے */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* ہلکا سا سایہ */
+}
+
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .btn-primary:active { background: var(--primary-light); transform: scale(0.98); }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Home View */
+        .bismillah-banner {
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 2rem;
+            color: var(--primary);
+            font-family: 'Amiri', serif; /* Or system Arabic font fallback */
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--bg) 0%, #e0e8e5 100%);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            padding: 20px;
+        }
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            text-decoration: none;
+            color: var(--primary);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:active { transform: scale(0.95); }
+        .card svg { width: 48px; height: 48px; margin-bottom: 12px; fill: var(--accent); }
+        .card h3 { font-size: 1.1rem; font-weight: 600; text-align: center; }
+
+        .about-section {
+            padding: 24px 20px;
+            margin: 0 20px 20px;
+            text-align: center;
+        }
+
+        .about-section h2 { color: var(--primary); margin-bottom: 16px; font-size: 1.3rem; }
+        .bio-text { margin-bottom: 12px; font-size: 0.95rem; line-height: 1.5; color: #444; }
+        .bio-text.arabic { font-size: 1.1rem; direction: rtl; }
+        .bio-text.urdu { font-size: 1.1rem; direction: rtl; }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .contact-btn svg { width: 18px; height: 18px; fill: var(--primary); }
+
+        /* Install PWA Banner */
+       /* Modern Floating Install Button */
+#install-banner {
+    display: none; /* Javascript will change this to flex when needed */
+    position: fixed;
+    bottom: 40px; /* Floats near the bottom of the screen */
+    left: 50%;
+    transform: translateX(-50%); /* Centers it perfectly */
+    background: white;
+    color: var(--primary); /* Uses your dark green */
+    padding: 8px 8px 8px 20px;
+    border-radius: 50px; /* Makes it a perfect pill shape */
+    box-shadow: 0 8px 24px rgba(11, 61, 46, 0.25); /* Adds a premium floating shadow */
+    z-index: 999;
+    align-items: center;
+    gap: 16px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: 1px solid rgba(11, 61, 46, 0.1);
+}
+
+#install-banner button { 
+    background: var(--primary); 
+    color: white; 
+    border: none; 
+    padding: 10px 20px; 
+    border-radius: 30px; 
+    font-weight: bold; 
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+#install-banner button:active { 
+    transform: scale(0.95);
+    background: var(--primary-light);
+}
+/* Style for the 'X' close button */
+#btn-close-install {
+    background: transparent;
+    color: #999; /* Light grey color */
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    padding: 0 8px 0 0; /* Adds a little space between the X and the text */
+    cursor: pointer;
+    font-weight: normal;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+#btn-close-install:active {
+    color: var(--text-dark);
+    transform: scale(0.9);
+}
+
+
+        /* Surah List View */
+        .search-container { padding: 16px; background: white; border-bottom: 1px solid #eee; position: sticky; top: 56px; z-index: 40; }
+        .search-container input { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 8px; font-size: 1rem; outline: none; transition: border-color 0.2s; }
+        .search-container input:focus { border-color: var(--primary); }
+
+        .surah-list { padding: 8px 16px; }
+        .surah-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            cursor: pointer;
+        }
+        .surah-item .number { width: 36px; height: 36px; background: var(--bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary); margin-right: 12px; }
+        .surah-item .details { flex: 1; }
+        .surah-item .name-en { font-weight: 600; font-size: 1.1rem; color: var(--text-dark); }
+        .surah-item .translation { font-size: 0.85rem; color: #666; }
+        .surah-item .name-ar { font-size: 1.4rem; font-weight: bold; color: var(--primary); font-family: 'Amiri', serif; }
+
+        /* Reader View */
+        #view-reader { background-color: var(--mushaf-bg); }
+        
+.reader-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    padding: 16px 20px;
+    background: linear-gradient(to bottom, var(--mushaf-bg) 60%, rgba(253, 251, 247, 0));
+    position: sticky;
+    top: 56px;
+    z-index: 40;
+    pointer-events: none;
+}
+
+.reader-actions button {
+    flex: unset;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(11, 61, 46, 0.2);
+    pointer-events: auto;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.reader-actions button:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 6px rgba(11, 61, 46, 0.15);
+}
+
+.reader-actions button svg {
+    width: 28px;
+    height: 28px;
+}
+
+
+/* Replace these existing classes in your <style> section */
+/* --- DYNAMIC SURAH HEADER --- */
+.surah-meta-header {
+    position: relative;
+    width: 100%;
+    margin-bottom: 12px;
+    padding-top: 10px;
+    direction: rtl; 
+    /* This perfectly stacks the name and ayah count in the center */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Pinned to the Left */
+.juz-badge {
+    position: absolute;
+    left: 0; 
+    top: 15px; /* Aligns it nicely with the Surah name */
+    font-family: 'Amiri', 'Traditional Arabic', serif;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--text-dark);
+}
+
+/* Big and Bold Surah Name */
+.surah-name-ar {
+    font-family: 'Amiri', 'Traditional Arabic', serif;
+    font-size: 1.8rem; /* Makes it large */
+    font-weight: 900;  /* Makes it thick/bold */
+    color: var(--text-dark);
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+
+/* Small Ayah Count Below Name */
+.ayah-count-ar {
+    font-family: 'Amiri', 'Traditional Arabic', serif;
+    font-size: 1rem; /* Smaller font */
+    font-weight: normal;
+    color: var(--text-dark);
+}
+
+/* Clean, Green Bismillah for the Reader */
+.reader-bismillah {
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 1.6rem;
+    color: var(--primary); /* Your dark green color */
+    font-family: 'Amiri', 'Traditional Arabic', serif;
+    font-weight: bold;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+
+.mushaf-container {
+    padding: 24px 20px;
+    text-align: justify; /* This is the secret to the flat-edged Mushaf look */
+    direction: rtl;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 2.6; /* Perfectly spaced for Arabic diacritics */
+}
+
+.ayah-block { 
+    display: inline; /* This forces the Ayahs to flow right next to each other */
+    margin-bottom: 0; 
+}
+
+.ayah-text {
+    font-size: 1.8rem;
+    color: var(--text-dark);
+    font-family: 'Amiri', 'Traditional Arabic', serif;
+}
+
+.ayah-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; /* Slightly larger to fit the symbol */
+    height: 36px;
+    font-size: 0.9rem;
+    font-weight: bold; /* Makes the number pop out */
+    margin: 0 8px;
+    color: var(--primary); /* Makes the number dark green for contrast */
+    vertical-align: middle;
+    border: none; /* Removes the old plain circle */
+    position: relative;
+    z-index: 1;
+}
+
+/* This creates the traditional ۝ symbol behind the number */
+.ayah-number::before {
+    content: "\06DD"; /* The Unicode for the Arabic End of Ayah marker */
+    font-size: 2.4rem; /* Big enough to enclose the number perfectly */
+    position: absolute;
+    font-family: 'Amiri', 'Traditional Arabic', serif;
+    color: var(--accent); /* Uses your golden accent color */
+    font-weight: normal;
+    z-index: -1;
+}
+
+
+/* Update the playing highlight so it looks good on inline text */
+.ayah-block.playing .ayah-text { 
+    color: var(--primary); 
+    font-weight: bold; 
+    background: rgba(193, 154, 107, 0.15); 
+}
+.ayah-block.playing { 
+    background: transparent; 
+    padding: 0; 
+}
+
+/* Ensure translations drop to a new line when activated */
+.ayah-translation-block {
+    display: none;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed #ddd;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #444;
+    text-align: left;
+}
+.ayah-translation-block.rtl { 
+    direction: rtl; 
+    text-align: right; 
+}
+
+
+        
+        .ayah-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            font-size: 0.9rem;
+            margin: 0 8px;
+            color: var(--accent);
+        }
+
+        .ayah-translation-block {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed #ddd;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #444;
+            text-align: left;
+            display: none; /* Shown via JS */
+        }
+        .ayah-translation-block.rtl { direction: rtl; text-align: right; }
+
+        .ayah-block.playing .ayah-text { color: var(--primary); font-weight: bold; }
+        .ayah-block.playing { background: rgba(193, 154, 107, 0.1); border-radius: 8px; padding: 8px; }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 100;
+        }
+
+        .modal-overlay.active { display: flex; animation: fadeInModal 0.2s forwards; }
+
+        .modal-content {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            transform: translateY(100%);
+            animation: slideUp 0.3s forwards ease-out;
+        }
+
+        @keyframes slideUp { to { transform: translateY(0); } }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { color: var(--primary); font-size: 1.2rem; }
+        .close-modal { background: none; border: none; font-size: 1.5rem; color: #666; cursor: pointer; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; color: #555; }
+        .form-row { display: flex; gap: 12px; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
+        
+        .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+        .modal-actions button { flex: 1; }
+
+        /* Qibla View */
+        .compass-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .compass-dial {
+            width: 280px;
+            height: 280px;
+            position: relative;
+            transition: transform 0.1s linear;
+        }
+
+        .compass-kaaba {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px; height: 40px;
+            fill: var(--text-dark);
+            z-index: 2;
+        }
+
+        .qibla-status { margin-top: 40px; text-align: center; }
+        .qibla-status h2 { font-size: 1.5rem; color: var(--primary); margin-bottom: 8px; }
+        .qibla-status p { color: #666; }
+        .qibla-perfect { color: var(--accent) !important; font-weight: bold; animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        /* Prayer Times View */
+        .prayer-header { text-align: center; padding: 24px 20px; background: var(--primary); color: white; border-radius: 0 0 24px 24px; box-shadow: var(--shadow-3d); }
+        .prayer-header h2 { font-size: 1.8rem; margin-bottom: 4px; color: var(--accent); }
+        .prayer-header .location { font-size: 0.9rem; opacity: 0.9; margin-bottom: 16px; }
+        .countdown { font-size: 2.5rem; font-weight: bold; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
+
+        .timetable { padding: 24px 20px; }
+        .prayer-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+        .prayer-row.next { background: var(--accent); color: white; font-weight: bold; transform: scale(1.02); box-shadow: 0 4px 12px rgba(193, 154, 107, 0.3); }
+        
+        /* Toast Notifications */
+        #toast-container {
+            position: fixed;
+            bottom: max(20px, var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .toast {
+            background: rgba(26, 26, 26, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: toastEnter 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes toastEnter {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes toastExit {
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
+        /* Loading Spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 40px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <div id="install-banner">
+        <button id="btn-close-install" aria-label="Dismiss">&times;</button>
+        <span>Install Noor Verse</span>
+        <button id="btn-install">Get App</button>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <div id="app-container">
+        
+        <div id="view-home" class="view active">
+<div class="header">
+    <h1>Noor Verse</h1>
+    <img src="logo.png" alt="Noor Verse Logo" class="header-logo">
+</div>
+
+            <div class="bismillah-banner">
+                بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
+            </div>
+
+            <div class="dashboard-grid">
+                <a class="card glass" onclick="app.navigate('surah-list')">
+                    <svg viewBox="0 0 24 24"><path d="M4 19v-14c0-1.1.9-2 2-2h12c1.1 0 2 .9 2 2v14c0 1.1-.9 2-2 2h-12c-1.1 0-2-.9-2-2zm2-14v14h12v-14h-12zm2 2h8v2h-8v-2zm0 4h8v2h-8v-2z"/></svg>
+                    <h3>Al-Quran</h3>
+                </a>
+                <a class="card glass" onclick="app.navigate('qibla')">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2l2 8 8 2-8 2-2 8-2-8-8-2 8-2z"/></svg>
+                    <h3>Qibla Compass</h3>
+                </a>
+                <a class="card glass" onclick="app.navigate('prayer')">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 7v5l4.25 2.52"/></svg>
+                    <h3>Prayer Times</h3>
+                </a>
+                <a class="card glass" href="webquraan.pdf" target="_blank">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                    <h3>Read PDF</h3>
+                </a>
+            </div>
+
+            <div class="about-section glass">
+                <h2>About Developer</h2>
+                <p class="bio-text">I am Abdur Rahman Mallik, an Alim and student. I am building this application for the benefit of the Ummah.</p>
+                <p class="bio-text urdu">میں عبدالرحمن ملک ہوں، ایک عالم اور طالب علم۔ میں یہ ایپلی کیشن امت کے فائدے کے لیے بنا رہا ہوں۔</p>
+                <p class="bio-text arabic">أنا عبد الرحمن مالك، عالم وطالب. أقوم ببناء هذا التطبيق لمنفعة الأمة.</p>
+                
+                <div class="contact-grid">
+                    <a href="https://wa.me/919239529167" target="_blank" class="contact-btn">WhatsApp</a>
+                    <a href="https://youtube.com/@ayatserenity-t4i?si=t5k33A2qdxutiAIP" target="_blank" class="contact-btn">YouTube</a>
+                    <a href="https://www.instagram.com/mallik.edittion?igsh=YXNwdm52OWxydnpz" target="_blank" class="contact-btn">Instagram</a>
+                    <a href="mailto:mallikabdurrahman37@gmail.com" class="contact-btn">Email</a>
+                    <a href="https://getversaindia-star.github.io/abdurrahmanmallik.com/" target="_blank" class="contact-btn" style="grid-column: 1 / -1;">Portfolio</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-surah-list" class="view">
+            <div class="header">
+                <button class="btn-icon" onclick="app.navigate('home')">
+                    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1>Surah Index</h1>
+                <div style="width: 40px;"></div> </div>
+            
+            <div class="search-container">
+                <input type="text" id="surah-search" placeholder="Search Surah Name, Number or Arabic...">
+            </div>
+
+            <div id="surah-list-container" class="surah-list">
+                <div class="loader"></div>
+            </div>
+        </div>
+
+        <div id="view-reader" class="view">
+            <div class="header">
+                <button class="btn-icon" onclick="app.navigate('surah-list')">
+                    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1 id="reader-surah-title">Loading...</h1>
+                <div style="width: 40px;"></div>
+            </div>
+
+              <div class="reader-actions">
+    <button class="btn-primary" aria-label="Listen settings" onclick="app.openModal('modal-tilawat')">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <button class="btn-primary" aria-label="Translation settings" onclick="app.openModal('modal-translation')" style="background: white; color: var(--primary); border: 2px solid var(--primary-light);">
+        <svg viewBox="0 0 24 24"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+    </button>
+</div>
+
+
+            <div id="mushaf-content" class="mushaf-container">
+                <div class="loader"></div>
+            </div>
+        </div>
+
+        <div id="view-qibla" class="view">
+            <div class="header">
+                <button class="btn-icon" onclick="app.navigate('home')">
+                    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1>Qibla Direction</h1>
+                <div style="width: 40px;"></div>
+            </div>
+
+            <div class="compass-container">
+                <div id="compass-dial" class="compass-dial">
+                    <svg viewBox="0 0 100 100" style="position:absolute; width:100%; height:100%; top:0; left:0;">
+                        <circle cx="50" cy="50" r="48" fill="none" stroke="var(--primary)" stroke-width="2" stroke-dasharray="4 4" />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--accent)" stroke-width="1" />
+                        <text x="50" y="15" text-anchor="middle" fill="var(--primary)" font-weight="bold" font-size="8">N</text>
+                        <text x="50" y="92" text-anchor="middle" fill="var(--primary)" font-size="8">S</text>
+                        <text x="10" y="53" text-anchor="middle" fill="var(--primary)" font-size="8">W</text>
+                        <text x="90" y="53" text-anchor="middle" fill="var(--primary)" font-size="8">E</text>
+                    </svg>
+                    <svg id="qibla-needle" viewBox="0 0 100 100" style="position:absolute; width:100%; height:100%; top:0; left:0; transform-origin: center; transition: transform 0.2s ease-out;">
+                        <polygon points="50,20 60,50 50,80 40,50" fill="var(--accent)" />
+                        <rect x="44" y="10" width="12" height="12" fill="#1A1A1A" />
+                        <rect x="44" y="13" width="12" height="2" fill="gold" />
+                    </svg>
+                </div>
+
+                <div class="qibla-status">
+                    <h2 id="qibla-angle-text">Finding Qibla...</h2>
+                    <p id="qibla-accuracy-text">Rotate device to align</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-prayer" class="view">
+            <div class="header">
+                <button class="btn-icon" onclick="app.navigate('home')">
+                    <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                </button>
+                <h1>Prayer Times</h1>
+                <div style="width: 40px;"></div>
+            </div>
+
+            <div class="prayer-header">
+                <p id="prayer-location" class="location">Hooghly, West Bengal (Default)</p>
+                <p>Next Prayer</p>
+                <h2 id="next-prayer-name">--</h2>
+                <div id="prayer-countdown" class="countdown">--:--:--</div>
+            </div>
+
+            <div id="timetable-container" class="timetable">
+                <div class="loader"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="modal-tilawat" class="modal-overlay">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h3>Listen (Tilawat)</h3>
+                <button class="close-modal" onclick="app.closeModal('modal-tilawat')">&times;</button>
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <label>Start Ayah</label>
+                    <input type="number" id="audio-start" class="form-control" min="1" value="1">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>End Ayah</label>
+                    <input type="number" id="audio-end" class="form-control" min="1">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-outline" id="btn-stop-audio" style="display:none;" onclick="app.audioController.stop()">Stop</button>
+                <button class="btn-primary" onclick="app.audioController.playRange()">Play Range</button>
+                <button class="btn-primary" onclick="app.audioController.playFull()">Play Full</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-translation" class="modal-overlay">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h3>Show Translation</h3>
+                <button class="close-modal" onclick="app.closeModal('modal-translation')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Language</label>
+                <select id="trans-lang" class="form-control">
+                    <option value="ur.jalandhry">Urdu</option>
+                    <option value="bn.bengali">Bengali</option>
+                    <option value="en.asad">English</option>
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <label>Start Ayah</label>
+                    <input type="number" id="trans-start" class="form-control" min="1" value="1">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>End Ayah</label>
+                    <input type="number" id="trans-end" class="form-control" min="1">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="app.loadTranslation()">Load Translation</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class NoorVerseApp {
+            constructor() {
+                this.state = {
+                    surahList: [],
+                    currentSurahInfo: null,
+                    currentSurahData: null, // Uthmani text
+                    userLocation: { lat: 22.9012, lon: 88.3899, city: 'Hooghly', default: true }, // Default
+                    qiblaAngle: 0
+                };
+                this.audioController = new AudioController(this);
+                this.init();
+            }
+
+            async init() {
+                this.registerSW();
+                this.handleInstallPrompt();
+                this.setupSearch();
+                
+                // Get Location early if possible, quietly
+                if(navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition((pos) => {
+                        this.state.userLocation = {
+                            lat: pos.coords.latitude,
+                            lon: pos.coords.longitude,
+                            city: 'Current Location',
+                            default: false
+                        };
+                    }, () => console.log("Location access denied. Using defaults."));
+                }
+            }
+
+            registerSW() {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('service-worker.js')
+                        .then(reg => console.log('SW Registered', reg))
+                        .catch(err => console.error('SW Error', err));
+                }
+            }
+
+                        handleInstallPrompt() {
+                let deferredPrompt;
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredPrompt = e;
+                    document.getElementById('install-banner').style.display = 'flex';
+                });
+
+                document.getElementById('btn-install').addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        if (outcome === 'accepted') {
+                            document.getElementById('install-banner').style.display = 'none';
+                        }
+                        deferredPrompt = null;
+                    }
+                });
+
+                // NEW: Logic to hide the banner when the 'X' is clicked
+                document.getElementById('btn-close-install').addEventListener('click', () => {
+                    document.getElementById('install-banner').style.display = 'none';
+                    deferredPrompt = null; // Clears the prompt so it stops bothering the user
+                });
+            }
+
+            showToast(msg, type = 'info') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = msg;
+                if(type === 'error') toast.style.background = '#e74c3c';
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.animation = 'toastExit 0.3s forwards';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            navigate(viewId) {
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                document.getElementById('view-' + viewId).classList.add('active');
+                window.scrollTo(0,0);
+
+                // View specific initialization
+                if(viewId === 'surah-list' && this.state.surahList.length === 0) this.loadSurahList();
+                if(viewId === 'qibla') this.initQibla();
+                if(viewId === 'prayer') this.loadPrayerTimes();
+            }
+
+            openModal(id) {
+                document.getElementById(id).classList.add('active');
+            }
+            closeModal(id) {
+                document.getElementById(id).classList.remove('active');
+            }
+
+            // --- QURAN LOGIC ---
+            async fetchWithCache(url, cacheKey) {
+                const cached = localStorage.getItem(cacheKey);
+                if (cached) return JSON.parse(cached);
+
+                try {
+                    const response = await fetch(url);
+                    if(!response.ok) throw new Error("API Error");
+                    const data = await response.json();
+                    if(data.code === 200) {
+                        try {
+                            localStorage.setItem(cacheKey, JSON.stringify(data.data));
+                        } catch(e) {
+                            console.warn("Storage full, not caching.");
+                        }
+                        return data.data;
+                    }
+                } catch (error) {
+                    this.showToast("Network error. Please try again.", "error");
+                    throw error;
+                }
+            }
+
+            async loadSurahList() {
+                try {
+                    const data = await this.fetchWithCache('https://api.alquran.cloud/v1/surah', 'quran_surahs');
+                    this.state.surahList = data;
+                    this.renderSurahList(data);
+                } catch (e) {
+                    document.getElementById('surah-list-container').innerHTML = '<p style="text-align:center;padding:20px;">Failed to load. Check connection.</p>';
+                }
+            }
+
+            renderSurahList(list) {
+                const container = document.getElementById('surah-list-container');
+                container.innerHTML = list.map(s => `
+                    <div class="surah-item" onclick="app.openReader(${s.number})">
+                        <div class="number">${s.number}</div>
+                        <div class="details">
+                            <div class="name-en">${s.englishName}</div>
+                            <div class="translation">${s.englishNameTranslation} • ${s.numberOfAyahs} Ayahs</div>
+                        </div>
+                        <div class="name-ar">${s.name}</div>
+                    </div>
+                `).join('');
+            }
+
+            setupSearch() {
+                document.getElementById('surah-search').addEventListener('input', (e) => {
+                    const q = e.target.value.toLowerCase();
+                    if(!this.state.surahList) return;
+                    
+                    const filtered = this.state.surahList.filter(s => 
+                        s.englishName.toLowerCase().includes(q) || 
+                        s.number.toString() === q ||
+                        s.name.includes(q)
+                    );
+                    this.renderSurahList(filtered);
+                });
+            }
+
+            async openReader(surahNum) {
+                this.navigate('reader');
+                this.audioController.stop();
+                
+                const surahInfo = this.state.surahList.find(s => s.number === surahNum);
+                this.state.currentSurahInfo = surahInfo;
+                document.getElementById('reader-surah-title').textContent = surahInfo.englishName;
+                document.getElementById('mushaf-content').innerHTML = '<div class="loader"></div>';
+                
+                // Set modal limits
+                document.getElementById('audio-end').value = surahInfo.numberOfAyahs;
+                document.getElementById('trans-end').value = surahInfo.numberOfAyahs;
+                document.getElementById('audio-end').max = surahInfo.numberOfAyahs;
+                document.getElementById('trans-end').max = surahInfo.numberOfAyahs;
+
+                try {
+                    const data = await this.fetchWithCache(`https://api.alquran.cloud/v1/surah/${surahNum}/quran-uthmani`, `surah_${surahNum}_uthmani`);
+                    this.state.currentSurahData = data;
+                    
+                                        let html = '';
+                    
+                    // 1. Calculate Para (Juz) range dynamically from the fetched ayahs
+                    const firstJuz = data.ayahs[0].juz;
+                    const lastJuz = data.ayahs[data.ayahs.length - 1].juz;
+                    const juzText = firstJuz === lastJuz ? this.toArabicDigits(firstJuz) : `${this.toArabicDigits(firstJuz)}-${this.toArabicDigits(lastJuz)}`;
+                    
+                    // 2. Build the top header with Surah Name, Ayah Count, and Para
+                    html += `
+                        <div class="surah-meta-header">
+                            <div class="juz-badge">پَارَه: ${juzText}</div>
+                         <div class="surah-name-ar">${surahInfo.name}</div>
+
+                            <div class="ayah-count-ar">الآيَة: ${this.toArabicDigits(surahInfo.numberOfAyahs)}</div>
+                        </div>
+                    `;
+
+                    // 3. Add the clean Bismillah below the header
+                    if (surahNum !== 1 && surahNum !== 9) {
+                        html += `<div class="reader-bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>`;
+                    }
+
+
+                    // 4. Map the Ayahs
+                    html += data.ayahs.map(a => {
+                        let cleanText = a.text;
+
+                        
+                        // Remove Bismillah from Ayah 1 (except for Surah Al-Fatihah and At-Tawbah)
+                        if (a.numberInSurah === 1 && surahNum !== 1 && surahNum !== 9) {
+                            cleanText = cleanText.replace('بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ', '').replace('\n', '').trim();
+                        }
+
+                        return `
+                        <div class="ayah-block" id="ayah-${a.numberInSurah}">
+                            <span class="ayah-text">${cleanText}</span>
+                            <span class="ayah-number">${this.toArabicDigits(a.numberInSurah)}</span>
+                            <div class="ayah-translation-block" id="trans-block-${a.numberInSurah}"></div>
+                        </div>
+                        `
+                    }).join('');
+
+                    
+                    document.getElementById('mushaf-content').innerHTML = html;
+                } catch (e) {
+                     document.getElementById('mushaf-content').innerHTML = '<p>Error loading text.</p>';
+                }
+            }
+
+            async loadTranslation() {
+                const lang = document.getElementById('trans-lang').value;
+                const start = parseInt(document.getElementById('trans-start').value);
+                const end = parseInt(document.getElementById('trans-end').value);
+                const surahNum = this.state.currentSurahInfo.number;
+
+                if(start < 1 || end > this.state.currentSurahInfo.numberOfAyahs || start > end) {
+                    this.showToast("Invalid Ayah range", "error"); return;
+                }
+
+                this.closeModal('modal-translation');
+                this.showToast("Fetching translation...");
+
+                try {
+                    const data = await this.fetchWithCache(`https://api.alquran.cloud/v1/surah/${surahNum}/${lang}`, `surah_${surahNum}_${lang}`);
+                    const isRtl = lang === 'ur.jalandhry';
+                    
+                    // Clear previous translations
+                    document.querySelectorAll('.ayah-translation-block').forEach(el => {
+                        el.style.display = 'none'; el.innerHTML = '';
+                    });
+                    data.ayahs.forEach(a => {
+                        if(a.numberInSurah >= start && a.numberInSurah <= end) {
+                            const block = document.getElementById(`trans-block-${a.numberInSurah}`);
+                            if(block) {
+                                block.innerHTML = a.text;
+                                block.style.display = 'block';
+                                block.className = `ayah-translation-block ${isRtl ? 'rtl' : ''}`;
+                            }
+                        }
+                    });
+                    this.showToast("Translation applied", "success");
+                } catch(e) {
+                     this.showToast("Failed to load translation", "error");
+                }
+            }
+
+            toArabicDigits(num) {
+                const arabicNumbers = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+                return String(num).split('').map(c => arabicNumbers[c]).join('');
+            }
+
+            // --- QIBLA LOGIC ---
+            async initQibla() {
+                if(!navigator.geolocation) {
+                    this.showToast("Geolocation not supported", "error"); return;
+                }
+
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    const { latitude, longitude } = pos.coords;
+                    try {
+                        const res = await fetch(`https://api.aladhan.com/v1/qibla/${latitude}/${longitude}`);
+                        const data = await res.json();
+                        this.state.qiblaAngle = data.data.direction;
+                        this.startCompass();
+                    } catch(e) {
+                        this.showToast("Failed to get Qibla angle", "error");
+                    }
+                }, () => this.showToast("Location required for Qibla", "error"));
+            }
+
+            startCompass() {
+                if (window.DeviceOrientationEvent) {
+                    // Check for iOS 13+ permission
+                    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                        DeviceOrientationEvent.requestPermission()
+                            .then(permissionState => {
+                                if (permissionState === 'granted') {
+                                    window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
+                                } else {
+                                    this.showToast("Permission denied for compass", "error");
+                                }
+                            }).catch(console.error);
+                    } else {
+                        window.addEventListener('deviceorientationabsolute', this.handleOrientation.bind(this), true) || 
+                        window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
+                    }
+                } else {
+                    document.getElementById('qibla-accuracy-text').textContent = "Compass not supported on device";
+                }
+            }
+
+            handleOrientation(event) {
+                let compassHeading = event.webkitCompassHeading || Math.abs(event.alpha - 360);
+                if (!compassHeading) return;
+
+                const qibla = this.state.qiblaAngle;
+                // Calculate rotation needed for needle to point to Qibla
+                // When device points North (heading 0), needle should point to qiblaAngle
+                // As device rotates (heading increases), needle must rotate opposite
+                let needleRotation = qibla - compassHeading;
+                
+                const needle = document.getElementById('qibla-needle');
+                const text = document.getElementById('qibla-accuracy-text');
+                const angleText = document.getElementById('qibla-angle-text');
+
+                needle.style.transform = `rotate(${needleRotation}deg)`;
+                
+                let diff = Math.abs((qibla - compassHeading + 360) % 360);
+                if(diff > 180) diff = 360 - diff;
+
+                if (diff < 3) {
+                    text.textContent = "Perfect Alignment!";
+                    text.classList.add('qibla-perfect');
+                    if("vibrate" in navigator) navigator.vibrate(50);
+                } else {
+                    text.textContent = "Rotate device to align";
+                    text.classList.remove('qibla-perfect');
+                }
+                angleText.textContent = `Qibla: ${qibla.toFixed(1)}°`;
+            }
+
+            // --- PRAYER TIMES LOGIC ---
+            async loadPrayerTimes() {
+                const loc = this.state.userLocation;
+                document.getElementById('prayer-location').textContent = loc.city + (loc.default ? ' (Default)' : '');
+                const dateStr = new Date().toLocaleDateString('en-GB').split('/').join('-'); // DD-MM-YYYY
+                const cacheKey = `prayer_${loc.city}_${dateStr}`;
+                
+                try {
+                    let data = JSON.parse(localStorage.getItem(cacheKey));
+                    if(!data) {
+                        const url = loc.default 
+                            ? `https://api.aladhan.com/v1/timingsByCity?city=Hooghly&country=India&method=1`
+                            : `https://api.aladhan.com/v1/timings/${Math.floor(Date.now()/1000)}?latitude=${loc.lat}&longitude=${loc.lon}&method=1`;
+                        
+                        const res = await fetch(url);
+                        const json = await res.json();
+                        data = json.data;
+                        localStorage.setItem(cacheKey, JSON.stringify(data));
+                    }
+                    this.renderTimetable(data.timings);
+                    this.startPrayerCountdown(data.timings);
+                } catch(e) {
+                    document.getElementById('timetable-container').innerHTML = '<p>Error loading timings.</p>';
+                }
+            }
+
+            renderTimetable(timings) {
+                const map = { 'Fajr':'Fajr', 'Sunrise':'Sunrise', 'Dhuhr':'Dhuhr', 'Asr':'Asr', 'Maghrib':'Maghrib', 'Isha':'Isha' };
+                let html = '';
+                for(let key in map) {
+                    html += `
+                        <div class="prayer-row" id="row-${key}">
+                            <span>${map[key]}</span>
+                            <span>${this.formatTime(timings[key])}</span>
+                        </div>
+                    `;
+                }
+                document.getElementById('timetable-container').innerHTML = html;
+            }
+
+            formatTime(time24) {
+                const [h, m] = time24.split(':');
+                let hours = parseInt(h);
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12; 
+                return `${hours}:${m} ${ampm}`;
+            }
+
+            startPrayerCountdown(timings) {
+                if(this.prayerInterval) clearInterval(this.prayerInterval);
+                const prayers = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+                
+                this.prayerInterval = setInterval(() => {
+                    const now = new Date();
+                    let nextPrayer = null;
+                    let nextPrayerTime = null;
+
+                    for(let p of prayers) {
+                        const [h, m] = timings[p].split(':');
+                        const pTime = new Date();
+                        pTime.setHours(parseInt(h), parseInt(m), 0, 0);
+                        
+                        if(pTime > now) {
+                            nextPrayer = p;
+                            nextPrayerTime = pTime;
+                            break;
+                        }
+                    }
+
+                    // Reset highlights
+                    document.querySelectorAll('.prayer-row').forEach(el => el.classList.remove('next'));
+
+                    if(nextPrayer) {
+                        document.getElementById('next-prayer-name').textContent = nextPrayer;
+                        const row = document.getElementById(`row-${nextPrayer}`);
+                        if(row) row.classList.add('next');
+
+                        const diff = nextPrayerTime - now;
+                        const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                        const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                        const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                        document.getElementById('prayer-countdown').textContent = `- ${h}:${m}:${s}`;
+                    } else {
+                        document.getElementById('next-prayer-name').textContent = "Fajr (Tomorrow)";
+                        document.getElementById('prayer-countdown').textContent = "Waiting...";
+                    }
+                }, 1000);
+            }
+        }
+
+        // --- AUDIO CONTROLLER CLASS ---
+        class AudioController {
+            constructor(app) {
+                this.app = app;
+                this.audioElement = new Audio();
+                this.playlist = [];
+                this.currentIndex = 0;
+                this.isPlaying = false;
+                
+                this.audioElement.addEventListener('ended', () => this.playNext());
+                this.audioElement.addEventListener('error', () => {
+                    this.app.showToast("Audio error", "error");
+                    this.stop();
+                });
+            }
+
+            async playRange() {
+                const start = parseInt(document.getElementById('audio-start').value);
+                const end = parseInt(document.getElementById('audio-end').value);
+                const surahInfo = this.app.state.currentSurahInfo;
+
+                if(start < 1 || end > surahInfo.numberOfAyahs || start > end) {
+                    this.app.showToast("Invalid range", "error"); return;
+                }
+                
+                this.app.closeModal('modal-tilawat');
+                document.getElementById('btn-stop-audio').style.display = 'block';
+                await this.preparePlaylist(surahInfo.number, start, end);
+                this.startPlayback();
+            }
+
+            async playFull() {
+                const surahInfo = this.app.state.currentSurahInfo;
+                document.getElementById('audio-start').value = 1;
+                document.getElementById('audio-end').value = surahInfo.numberOfAyahs;
+                this.playRange();
+            }
+
+            async preparePlaylist(surahNum, startAyah, endAyah) {
+                this.app.showToast("Fetching Audio...");
+                try {
+                    // Fetch edition: ar.alafasy
+                    const data = await this.app.fetchWithCache(`https://api.alquran.cloud/v1/surah/${surahNum}/ar.alafasy`, `surah_${surahNum}_audio`);
+                    this.playlist = data.ayahs.filter(a => a.numberInSurah >= startAyah && a.numberInSurah <= endAyah);
+                    this.currentIndex = 0;
+                } catch(e) {
+                    this.app.showToast("Failed to fetch audio", "error");
+                    this.playlist = [];
+                }
+            }
+
+            startPlayback() {
+                if(this.playlist.length === 0) return;
+                this.isPlaying = true;
+                this.playCurrent();
+            }
+
+            playCurrent() {
+                const ayahData = this.playlist[this.currentIndex];
+                if(!ayahData) { this.stop(); return; }
+
+                this.audioElement.src = ayahData.audio;
+                this.audioElement.play().catch(e => {
+                    console.error(e);
+                    this.app.showToast("Playback blocked by browser", "error");
+                    this.stop();
+                });
+
+                // Highlight & Scroll
+                document.querySelectorAll('.ayah-block').forEach(el => el.classList.remove('playing'));
+                const block = document.getElementById(`ayah-${ayahData.numberInSurah}`);
+                if(block) {
+                    block.classList.add('playing');
+                    // Smooth scroll to element, centering it
+                    block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+
+            playNext() {
+                this.currentIndex++;
+                if(this.currentIndex < this.playlist.length) {
+                    this.playCurrent();
+                } else {
+                    this.stop();
+                    this.app.showToast("Tilawat Completed", "success");
+                }
+            }
+
+            stop() {
+                this.isPlaying = false;
+                this.audioElement.pause();
+                this.audioElement.currentTime = 0;
+                document.getElementById('btn-stop-audio').style.display = 'none';
+                document.querySelectorAll('.ayah-block').forEach(el => el.classList.remove('playing'));
+            }
+        }
+
+        // Initialize App
+        const app = new NoorVerseApp();
+
+    </script>
+</body>
+</html>
+
+              
