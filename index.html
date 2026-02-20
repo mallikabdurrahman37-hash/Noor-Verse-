@@ -972,25 +972,32 @@
                 }
             }
 
-                        handleInstallPrompt() {
-                let deferredPrompt;
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    deferredPrompt = e;
-                    document.getElementById('install-banner').style.display = 'flex';
-                });
-
-                document.getElementById('btn-install').addEventListener('click', async () => {
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt();
-                        const { outcome } = await deferredPrompt.userChoice;
-                        if (outcome === 'accepted') {
-                            document.getElementById('install-banner').style.display = 'none';
-                        }
-                        deferredPrompt = null;
+                                    handleInstallPrompt() {
+                // Show the banner automatically after 2 seconds
+                setTimeout(() => {
+                    // Only show if the user hasn't closed it before
+                    if (localStorage.getItem('hide_apk_banner') !== 'true') {
+                        document.getElementById('install-banner').style.display = 'flex';
                     }
+                }, 2000);
+
+                // NEW: Direct APK Download Logic
+                document.getElementById('btn-install').addEventListener('click', () => {
+                    // Triggers the Google Drive direct download link
+                    window.location.href = 'https://drive.google.com/uc?id=1io4qGGLfmK3XIA_KFbffTpPbcS2SziG0';
+                    
+                    // Hide the banner after clicking
+                    document.getElementById('install-banner').style.display = 'none';
                 });
 
+                // Close Button Logic
+                document.getElementById('btn-close-install').addEventListener('click', () => {
+                    document.getElementById('install-banner').style.display = 'none';
+                    // Saves the user's choice so the banner doesn't annoy them on every visit
+                    localStorage.setItem('hide_apk_banner', 'true');
+                });
+            }
+            
                 // NEW: Logic to hide the banner when the 'X' is clicked
                 document.getElementById('btn-close-install').addEventListener('click', () => {
                     document.getElementById('install-banner').style.display = 'none';
