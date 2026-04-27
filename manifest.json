@@ -1,0 +1,42 @@
+{
+  "name": "NoorVerse – Islamic Quran App",
+  "short_name": "NoorVerse",
+  "description": "A premium Islamic Quran app with Qibla Compass, Prayer Times, Audio Recitation & more.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#E8F5E9",
+  "theme_color": "#0B3D2E",
+  "lang": "en",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "assets/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "religion", "lifestyle"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Al-Quran",
+      "short_name": "Quran",
+      "url": "index.html#surah-list-view",
+      "icons": [{ "src": "assets/quraan.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Prayer Times",
+      "short_name": "Prayer",
+      "url": "index.html#prayer-view",
+      "icons": [{ "src": "assets/prayer.png", "sizes": "96x96" }]
+    }
+  ]
+}
